@@ -1,0 +1,47 @@
+import base64
+from pathlib import Path
+from openai import AsyncOpenAI
+from app.models.config import get_settings
+
+settings = get_settings()
+
+
+class OCRService:
+    def __init__(self):
+        self.client = AsyncOpenAI(api_key=settings.openai_api_key)
+    
+    async def transcribe_image(self, image_path: Path) -> str:
+        """Transcribe handwritten text from image using GPT-4 Vision"""
+        
+        # Read and encode image
+        with open(image_path, "rb") as img_file:
+            image_data = base64.b64encode(img_file.read()).decode("utf-8")
+        
+        # Call OpenAI API
+        response = await self.client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                "Transcribe all handwritten text from this image. "
+                                "This is a construction proposal written by a contractor. "
+                                "Extract exactly what is written, maintaining the structure and details."
+                            )
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_data}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=2000
+        )
+        
+        return response.choices[0].message.content

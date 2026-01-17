@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+out/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (CRITICAL - contains API keys)
+.env
+.env.local
+.env.production.local
+.env.*.local
+apps/api/.env
+
+# Data directories (CRITICAL - contains client info, proposals, images)
+data/
+data/raw_uploads/
+data/sessions/
+data/ground_truth/
+
+# Templates with sensitive info
+# Uncomment if your invoice template has sensitive business info:
+# apps/api/app/templates/*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Deployment
+.vercel
+.railway
+
+# Testing
+.pytest_cache/
+*.cover
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+

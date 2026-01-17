@@ -1,0 +1,35 @@
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from app.services.ocr_service import OCRService
+from app.models.schemas import TranscriptionResponse
+from app.storage.file_manager import FileManager
+import uuid
+
+router = APIRouter()
+ocr_service = OCRService()
+file_manager = FileManager()
+
+
+@router.post("/upload", response_model=TranscriptionResponse)
+async def transcribe_image(file: UploadFile = File(...)):
+    """Upload handwritten image and get transcription"""
+    
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Generate session ID
+    session_id = str(uuid.uuid4())
+    
+    # Save uploaded file
+    image_path = await file_manager.save_upload(session_id, file)
+    
+    # Transcribe handwriting
+    raw_text = await ocr_service.transcribe_image(image_path)
+    
+    # Save raw transcription
+    await file_manager.save_transcription(session_id, raw_text)
+    
+    return TranscriptionResponse(
+        session_id=session_id,
+        raw_text=raw_text,
+        status="transcribed"
+    )
