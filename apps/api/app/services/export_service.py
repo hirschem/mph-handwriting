@@ -42,50 +42,46 @@ class ExportService:
         # Set font
         can.setFont("Helvetica", 12)
         
-        # Position data on template based on red line markings
-        left_margin = 0.75 * inch  # Left edge for text
-        max_text_width = 5.75 * inch  # Max width for description box (left red box)
-        amount_x = 7.0 * inch  # Right column for amounts
+        # Position data to align with template labels
         
-        # Date - first red line
+        # Date - right after "Date:" label
         can.setFont("Helvetica", 12)
-        can.drawString(left_margin, height - 1.95 * inch, datetime.now().strftime('%m/%d/%Y'))
+        can.drawString(1.5 * inch, height - 2.0 * inch, datetime.now().strftime('%m/%d/%Y'))
         
-        # Bill To: Client name - second red line
+        # Bill To: Name - right after "Bill To:" label
         if data.client_name:
             can.setFont("Helvetica", 12)
-            can.drawString(left_margin, height - 2.25 * inch, data.client_name)
+            can.drawString(1.5 * inch, height - 2.3 * inch, data.client_name)
         
-        # Bill To: Address - third red line
+        # Bill To: Address - below name
         if data.project_address:
             can.setFont("Helvetica", 12)
-            can.drawString(left_margin, height - 2.48 * inch, data.project_address)
+            can.drawString(1.5 * inch, height - 2.5 * inch, data.project_address)
         
-        # Start position for description text (below the Bill To section)
-        y_position = height - 3.5 * inch
+        # Start position for content below headers
+        left_margin = 1.0 * inch  # Description column starts here
+        amount_column_x = 7.5 * inch  # Amount column position
+        y_position = height - 4.0 * inch  # Start below Description/Amount headers
         bottom_margin = 1.5 * inch
         
         # Line Items - place in template table if present
         if data.line_items and len(data.line_items) > 0:
-            # Starting position for line items in template
-            line_y = height - 4.2 * inch
+            line_y = y_position
             can.setFont("Helvetica", 11)
             
             for idx, item in enumerate(data.line_items):
-                # Description in left red box
+                # Description in left column (below "Description" header)
                 if item.description:
-                    # Wrap description to fit within max_text_width
-                    desc_text = item.description[:80]  # Limit length
+                    desc_text = item.description[:80]
                     can.drawString(left_margin, line_y, desc_text)
                 
-                # Amount in right red box (right-aligned)
+                # Amount in right column (below "Amount" header), right-aligned
                 if item.amount:
-                    can.drawRightString(amount_x + 0.5 * inch, line_y, f"${item.amount:.2f}")
+                    can.drawRightString(amount_column_x, line_y, f"${item.amount:.2f}")
                 
-                line_y -= 0.25 * inch  # Move to next line
+                line_y -= 0.25 * inch
                 
-                # Check if we need a new page (template has limited rows)
-                if idx > 15:  # Assuming ~16 rows per page
+                if idx > 15:
                     break
         
         # Reset for content area - professionally rewritten proposal text
