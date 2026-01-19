@@ -23,14 +23,14 @@ class ExportService:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
         if format == "pdf":
-            self._generate_pdf(proposal_data, output_path)
+            self._generate_pdf(session_id, proposal_data, output_path)
         else:
             # Fallback to text format
             self._generate_text(proposal_data, output_path)
         
         return output_path
     
-    def _generate_pdf(self, data: ProposalData, output_path: Path):
+    def _generate_pdf(self, session_id: str, data: ProposalData, output_path: Path):
         """Generate PDF by overlaying data onto MPH template"""
         
         # Create overlay with proposal data
