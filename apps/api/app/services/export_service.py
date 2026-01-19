@@ -61,140 +61,121 @@ class ExportService:
         
         y_position -= 20
         
+        # Content area - professionally rewritten proposal text
+        can.setFont("Helvetica", 10)
+        
         # Scope of Work
         if data.scope_of_work:
-            can.setFont("Helvetica-Bold", 11)
-            can.drawString(1 * inch, y_position, "SCOPE OF WORK")
-            y_position -= 20
-            
-            can.setFont("Helvetica", 10)
             for item in data.scope_of_work:
                 # Check if we need a new page
                 if y_position < bottom_margin + 30:
                     can.showPage()
-                    y_position = height - 1 * inch
+                    y_position = height - 1.5 * inch
                     can.setFont("Helvetica", 10)
                 
                 # Wrap long text
-                if len(item) > 80:
+                if len(item) > 90:
                     words = item.split()
                     line = ""
                     for word in words:
-                        if len(line + word) < 80:
+                        if len(line + word) < 90:
                             line += word + " "
                         else:
                             if y_position < bottom_margin + 30:
                                 can.showPage()
-                                y_position = height - 1 * inch
+                                y_position = height - 1.5 * inch
                                 can.setFont("Helvetica", 10)
-                            can.drawString(1.2 * inch, y_position, "• " + line.strip())
+                            can.drawString(1.2 * inch, y_position, line.strip())
                             y_position -= 15
                             line = word + " "
                     if line:
                         if y_position < bottom_margin + 30:
                             can.showPage()
-                            y_position = height - 1 * inch
+                            y_position = height - 1.5 * inch
                             can.setFont("Helvetica", 10)
-                        can.drawString(1.2 * inch, y_position, "• " + line.strip())
+                        can.drawString(1.2 * inch, y_position, line.strip())
                         y_position -= 15
                 else:
-                    can.drawString(1.2 * inch, y_position, "• " + item)
+                    can.drawString(1.2 * inch, y_position, item)
                     y_position -= 15
             
             y_position -= 10
         
-        # Line Items Table
-        if data.line_items:
-            # Check if we need a new page
-            if y_position < bottom_margin + 100:
-                can.showPage()
-                y_position = height - 1 * inch
-            
-            y_position -= 20
-            can.setFont("Helvetica-Bold", 10)
-            can.drawString(1 * inch, y_position, "Description")
-            can.drawString(4.5 * inch, y_position, "Qty")
-            can.drawString(5.2 * inch, y_position, "Rate")
-            can.drawString(6.2 * inch, y_position, "Amount")
-            y_position -= 5
-            
-            # Draw line
-            can.line(1 * inch, y_position, width - 1 * inch, y_position)
-            y_position -= 15
-            
-            can.setFont("Helvetica", 9)
-            for item in data.line_items:
-                # Check if we need a new page
-                if y_position < bottom_margin + 30:
-                    can.showPage()
-                    y_position = height - 1 * inch
-                    can.setFont("Helvetica", 9)
-                
-                can.drawString(1 * inch, y_position, item.description or "")
-                if item.quantity:
-                    can.drawString(4.5 * inch, y_position, str(item.quantity))
-                if item.rate:
-                    can.drawString(5.2 * inch, y_position, f"${item.rate:.2f}")
-                if item.amount:
-                    can.drawRightString(width - 1 * inch, y_position, f"${item.amount:.2f}")
-                y_position -= 15
-        
-        # Totals
-        y_position -= 20
-        can.setFont("Helvetica-Bold", 10)
-        
-        if data.subtotal:
-            can.drawString(5.5 * inch, y_position, "Subtotal:")
-            can.drawRightString(width - 1 * inch, y_position, f"${data.subtotal:.2f}")
-            y_position -= 15
-        
-        if data.tax:
-            can.drawString(5.5 * inch, y_position, "Tax:")
-            can.drawRightString(width - 1 * inch, y_position, f"${data.tax:.2f}")
-            y_position -= 15
-        
-        if data.total:
-            can.setFont("Helvetica-Bold", 12)
-            can.drawString(5.5 * inch, y_position, "TOTAL:")
-            can.drawRightString(width - 1 * inch, y_position, f"${data.total:.2f}")
-            y_position -= 30
-        
         # Payment Terms
         if data.payment_terms:
-            can.setFont("Helvetica-Bold", 10)
-            can.drawString(1 * inch, y_position, "Payment Terms:")
-            y_position -= 15
-            can.setFont("Helvetica", 9)
-            can.drawString(1 * inch, y_position, data.payment_terms)
-            y_position -= 20
+            if y_position < bottom_margin + 50:
+                can.showPage()
+                y_position = height - 1.5 * inch
+            
+            can.setFont("Helvetica", 10)
+            # Wrap payment terms text
+            if len(data.payment_terms) > 90:
+                words = data.payment_terms.split()
+                line = ""
+                for word in words:
+                    if len(line + word) < 90:
+                        line += word + " "
+                    else:
+                        if y_position < bottom_margin + 30:
+                            can.showPage()
+                            y_position = height - 1.5 * inch
+                            can.setFont("Helvetica", 10)
+                        can.drawString(1.2 * inch, y_position, line.strip())
+                        y_position -= 15
+                        line = word + " "
+                if line:
+                    can.drawString(1.2 * inch, y_position, line.strip())
+                    y_position -= 15
+            else:
+                can.drawString(1.2 * inch, y_position, data.payment_terms)
+                y_position -= 15
+            y_position -= 10
         
         # Timeline
         if data.timeline:
-            can.setFont("Helvetica-Bold", 10)
-            can.drawString(1 * inch, y_position, "Timeline:")
-            y_position -= 15
-            can.setFont("Helvetica", 9)
-            can.drawString(1 * inch, y_position, data.timeline)
-            y_position -= 20
+            if y_position < bottom_margin + 50:
+                can.showPage()
+                y_position = height - 1.5 * inch
+            
+            can.setFont("Helvetica", 10)
+            # Wrap timeline text
+            if len(data.timeline) > 90:
+                words = data.timeline.split()
+                line = ""
+                for word in words:
+                    if len(line + word) < 90:
+                        line += word + " "
+                    else:
+                        if y_position < bottom_margin + 30:
+                            can.showPage()
+                            y_position = height - 1.5 * inch
+                            can.setFont("Helvetica", 10)
+                        can.drawString(1.2 * inch, y_position, line.strip())
+                        y_position -= 15
+                        line = word + " "
+                if line:
+                    can.drawString(1.2 * inch, y_position, line.strip())
+                    y_position -= 15
+            else:
+                can.drawString(1.2 * inch, y_position, data.timeline)
+                y_position -= 15
+            y_position -= 10
         
         # Notes
         if data.notes:
             # Check if we need a new page
             if y_position < bottom_margin + 50:
                 can.showPage()
-                y_position = height - 1 * inch
+                y_position = height - 1.5 * inch
             
-            can.setFont("Helvetica-Bold", 10)
-            can.drawString(1 * inch, y_position, "Notes:")
-            y_position -= 15
-            can.setFont("Helvetica", 9)
+            can.setFont("Helvetica", 10)
             # Wrap notes text
             notes_lines = data.notes.split('\n')
             for line in notes_lines:
                 if y_position < bottom_margin + 30:
                     can.showPage()
-                    y_position = height - 1 * inch
-                    can.setFont("Helvetica", 9)
+                    y_position = height - 1.5 * inch
+                    can.setFont("Helvetica", 10)
                 
                 if len(line) > 90:
                     words = line.split()
@@ -205,21 +186,21 @@ class ExportService:
                         else:
                             if y_position < bottom_margin + 30:
                                 can.showPage()
-                                y_position = height - 1 * inch
-                                can.setFont("Helvetica", 9)
-                            can.drawString(1 * inch, y_position, current_line.strip())
-                            y_position -= 12
+                                y_position = height - 1.5 * inch
+                                can.setFont("Helvetica", 10)
+                            can.drawString(1.2 * inch, y_position, current_line.strip())
+                            y_position -= 15
                             current_line = word + " "
                     if current_line:
                         if y_position < bottom_margin + 30:
                             can.showPage()
-                            y_position = height - 1 * inch
-                            can.setFont("Helvetica", 9)
-                        can.drawString(1 * inch, y_position, current_line.strip())
-                        y_position -= 12
+                            y_position = height - 1.5 * inch
+                            can.setFont("Helvetica", 10)
+                        can.drawString(1.2 * inch, y_position, current_line.strip())
+                        y_position -= 15
                 else:
-                    can.drawString(1 * inch, y_position, line)
-                    y_position -= 12
+                    can.drawString(1.2 * inch, y_position, line)
+                    y_position -= 15
         
         # Add Total at the bottom of the last page
         # Calculate total from all line items
