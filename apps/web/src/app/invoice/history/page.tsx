@@ -33,11 +33,6 @@ export default function HistoryPage() {
       setLoading(false)
     }
   }
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleDelete = async (sessionId: string) => {
     if (!confirm('Are you sure you want to delete this proposal?')) {
