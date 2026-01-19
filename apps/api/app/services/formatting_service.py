@@ -49,7 +49,9 @@ class FormattingService:
                         "Return a JSON object with: client_name, project_address, "
                         "scope_of_work (array), line_items (array with description, quantity, rate, amount), "
                         "subtotal, tax, total, payment_terms, timeline, notes. "
-                        "If any field is not present, use null."
+                        "IMPORTANT: For numeric fields (subtotal, tax, total, quantity, rate, amount), "
+                        "use null if the value is not present or cannot be determined. "
+                        "Do NOT use placeholder strings like '[Enter Amount]' - use null instead."
                     )
                 },
                 {
@@ -61,4 +63,16 @@ class FormattingService:
         )
         
         data = json.loads(response.choices[0].message.content)
+        
+        # Clean up any string placeholders that slipped through
+        for field in ['subtotal', 'tax', 'total']:
+            if field in data and isinstance(data[field], str):
+                data[field] = None
+        
+        if 'line_items' in data and data['line_items']:
+            for item in data['line_items']:
+                for field in ['quantity', 'rate', 'amount']:
+                    if field in item and isinstance(item[field], str):
+                        item[field] = None
+        
         return ProposalData(**data)
