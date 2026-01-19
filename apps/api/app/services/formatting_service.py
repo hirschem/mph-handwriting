@@ -53,12 +53,21 @@ class FormattingService:
                     "role": "system",
                     "content": (
                         "Extract structured data from this construction proposal. "
-                        "Return a JSON object with: client_name, project_address, "
-                        "scope_of_work (array), line_items (array with description, quantity, rate, amount), "
-                        "subtotal, tax, total, payment_terms, timeline, notes. "
-                        "IMPORTANT: For numeric fields (subtotal, tax, total, quantity, rate, amount), "
-                        "use null if the value is not present or cannot be determined. "
-                        "Do NOT use placeholder strings like '[Enter Amount]' - use null instead."
+                        "Return a JSON object with these fields:\n"
+                        "- client_name (string or null)\n"
+                        "- project_address (string or null)\n"
+                        "- scope_of_work (array of strings or null)\n"
+                        "- line_items (array of objects with description (string), quantity (number or null), rate (number or null), amount (number or null), or null)\n"
+                        "- subtotal (number or null)\n"
+                        "- tax (number or null)\n"
+                        "- total (number or null)\n"
+                        "- payment_terms (STRING or null - combine all payment info into one paragraph)\n"
+                        "- timeline (STRING or null - combine all timeline info into one paragraph)\n"
+                        "- notes (string or null)\n\n"
+                        "IMPORTANT RULES:\n"
+                        "1. For numeric fields, use null if not present - NEVER use strings or placeholders\n"
+                        "2. payment_terms and timeline MUST be plain strings, NOT objects or arrays\n"
+                        "3. If a line_item has no description, omit it entirely"
                     )
                 },
                 {
@@ -71,15 +80,32 @@ class FormattingService:
         
         data = json.loads(response.choices[0].message.content)
         
-        # Clean up any string placeholders that slipped through
+        # Clean up any string placeholders or wrong types
         for field in ['subtotal', 'tax', 'total']:
-            if field in data and isinstance(data[field], str):
+            if field in data and (isinstance(data[field], str) or data[field] == {}):
                 data[field] = None
+        
+        # payment_terms and timeline should be strings, not dicts
+        for field in ['payment_terms', 'timeline', 'notes']:
+            if field in data:
+                if isinstance(data[field], dict):
+                    # Convert dict to string
+                    data[field] = str(data[field])
+                elif not data[field]:
+                    data[field] = None
         
         if 'line_items' in data and data['line_items']:
             for item in data['line_items']:
+                # Clean numeric fields
                 for field in ['quantity', 'rate', 'amount']:
-                    if field in item and isinstance(item[field], str):
+                    if field in item and (isinstance(item[field], str) or item[field] == {}):
                         item[field] = None
+                # Clean description field
+                if 'description' in item:
+                    if not item['description'] or (isinstance(item['description'], str) and item['description'].strip() == ''):
+                        item['description'] = None
+            
+            # Filter out line items with no description
+            data['line_items'] = [item for item in data['line_items'] if item.get('description')]
         
         return ProposalData(**data)

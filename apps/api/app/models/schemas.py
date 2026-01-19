@@ -14,7 +14,7 @@ class ProposalRequest(BaseModel):
 
 
 class LineItem(BaseModel):
-    description: str
+    description: Optional[str] = None
     quantity: Optional[float] = None
     rate: Optional[float] = None
     amount: Optional[float] = None
