@@ -89,6 +89,25 @@ export default function UploadForm({ onSuccess }: UploadFormProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+      {/* Hidden inputs - always rendered */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+        className="hidden"
+        multiple
+      />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+        multiple
+      />
+      
       <form onSubmit={handleSubmit} className="space-y-4">
         {previews.length === 0 ? (
           <div className="space-y-4">
@@ -127,25 +146,6 @@ export default function UploadForm({ onSuccess }: UploadFormProps) {
               </svg>
               Choose from Gallery
             </button>
-
-            {/* Hidden inputs */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileChange}
-              className="hidden"
-              multiple
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              multiple
-            />
           </div>
         ) : (
           <div className="space-y-4">
