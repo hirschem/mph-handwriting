@@ -25,14 +25,6 @@ export default function Home() {
   )
 }
 
-        />
-
-        {proposalData && (
-          <ProposalDisplay 
-            sessionId={sessionId!} 
-            data={proposalData} 
-          />
-        )}
       </div>
     </main>
   )
