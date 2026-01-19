@@ -47,8 +47,23 @@ export async function exportProposal(sessionId: string, format: string = 'pdf') 
   return response.json()
 }
 
+function getAuthHeader(): HeadersInit {
+  const stored = localStorage.getItem('mph_auth')
+  if (stored) {
+    try {
+      const { password } = JSON.parse(stored)
+      return { 'Authorization': `Bearer ${password}` }
+    } catch (e) {
+      return {}
+    }
+  }
+  return {}
+}
+
 export async function listProposals() {
-  const response = await fetch(`${API_URL}/api/history/list`)
+  const response = await fetch(`${API_URL}/api/history/list`, {
+    headers: getAuthHeader()
+  })
 
   if (!response.ok) {
     throw new Error('Failed to fetch proposals')
@@ -58,7 +73,9 @@ export async function listProposals() {
 }
 
 export async function getProposal(sessionId: string) {
-  const response = await fetch(`${API_URL}/api/history/${sessionId}`)
+  const response = await fetch(`${API_URL}/api/history/${sessionId}`, {
+    headers: getAuthHeader()
+  })
 
   if (!response.ok) {
     throw new Error('Failed to fetch proposal')
@@ -70,6 +87,7 @@ export async function getProposal(sessionId: string) {
 export async function deleteProposal(sessionId: string) {
   const response = await fetch(`${API_URL}/api/history/${sessionId}`, {
     method: 'DELETE',
+    headers: getAuthHeader()
   })
 
   if (!response.ok) {

@@ -1,0 +1,87 @@
+'use client'
+
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+
+type AuthLevel = 'demo' | 'admin' | null
+
+interface AuthContextType {
+  authLevel: AuthLevel
+  password: string | null
+  login: (password: string) => Promise<void>
+  logout: () => void
+  isAuthenticated: boolean
+  isAdmin: boolean
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [authLevel, setAuthLevel] = useState<AuthLevel>(null)
+  const [password, setPassword] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Check localStorage for existing auth
+    const stored = localStorage.getItem('mph_auth')
+    if (stored) {
+      try {
+        const { authLevel, password } = JSON.parse(stored)
+        setAuthLevel(authLevel)
+        setPassword(password)
+      } catch (e) {
+        localStorage.removeItem('mph_auth')
+      }
+    }
+  }, [])
+
+  const login = async (pwd: string) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Invalid password')
+    }
+
+    const data = await response.json()
+    setAuthLevel(data.auth_level)
+    setPassword(pwd)
+    
+    localStorage.setItem('mph_auth', JSON.stringify({ 
+      authLevel: data.auth_level, 
+      password: pwd 
+    }))
+  }
+
+  const logout = () => {
+    setAuthLevel(null)
+    setPassword(null)
+    localStorage.removeItem('mph_auth')
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        authLevel,
+        password,
+        login,
+        logout,
+        isAuthenticated: authLevel !== null,
+        isAdmin: authLevel === 'admin',
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}

@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.storage.file_manager import FileManager
 from app.models.schemas import ProposalListResponse, ProposalSummary
+from app.auth import require_admin
 from pathlib import Path
 import json
 from datetime import datetime
@@ -10,7 +11,7 @@ file_manager = FileManager()
 
 
 @router.get("/list", response_model=ProposalListResponse)
-async def list_proposals():
+async def list_proposals(auth_level: str = Depends(require_admin)):
     """Get list of all proposals"""
     
     proposals = []
@@ -59,7 +60,7 @@ async def list_proposals():
 
 
 @router.get("/{session_id}")
-async def get_proposal(session_id: str):
+async def get_proposal(session_id: str, auth_level: str = Depends(require_admin)):
     """Get full proposal data by session ID"""
     
     proposal_data = await file_manager.load_proposal(session_id)
@@ -74,7 +75,7 @@ async def get_proposal(session_id: str):
 
 
 @router.delete("/{session_id}")
-async def delete_proposal(session_id: str):
+async def delete_proposal(session_id: str, auth_level: str = Depends(require_admin)):
     """Delete a proposal"""
     
     session_dir = file_manager.sessions_dir / session_id

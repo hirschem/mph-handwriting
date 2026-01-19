@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     api_host: str = "localhost"
     api_port: int = 8000
     
+    # Authentication
+    demo_password: str = "demo2024"
+    admin_password: str = "mph_admin_2024"
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False
