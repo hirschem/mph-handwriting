@@ -71,7 +71,7 @@ export default function LoginPage() {
 
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-600 text-center">
-            <strong>Demo Access:</strong> Try password "demo2024" to test the app
+            <strong>Demo Access:</strong> Try password "demo2026" to test the app
           </p>
         </div>
       </div>
